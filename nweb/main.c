@@ -13,6 +13,7 @@
 #define BUFSIZE 8096
 #define ERROR      42
 #define LOG        44
+#define LOGRET     45
 #define FORBIDDEN 403
 #define NOTFOUND  404
 
@@ -53,7 +54,9 @@ void logger(int type, char *s1, char *s2, int socket_fd)
         write(socket_fd, "HTTP/1.1 404 Not Found\nContent-Length: 136\nConnection: close\nContent-Type: text/html\n\n<html><head>\n<title>404 Not Found</title>\n</head><body>\n<h1>Not Found</h1>\nThe requested URL was not found on this server.\n</body></html>\n",224);
         sprintf(logbuffer,"NOT FOUND: %s:%s",s1, s2);
         break;
-    case LOG: sprintf(logbuffer," INFO: %s:%s:%d",s1, s2,socket_fd); break;
+    case LOG:
+            sprintf(logbuffer," INFO: %s:%s:%d",s1, s2,socket_fd);
+    break;
     }
     /* No checks here, nothing can be done with a failure anyway */
     if((fd = open("nweb.log", O_CREAT| O_WRONLY | O_APPEND,0644)) >= 0) {
@@ -74,7 +77,12 @@ void web(int fd, int hit)
     char * fstr;
     static char buffer[BUFSIZE+1]; /* static so zero filled */
 
+    
     ret = read(fd,buffer,BUFSIZE);     /* read Web request in one go */
+    
+    
+    logger(LOG,"request before","",ret);
+    
     
     if(ret == 0 || ret == -1) {    /* read failure stop now */
         logger(FORBIDDEN,"failed to read browser request","",fd);
@@ -224,6 +232,12 @@ int main(int argc, char **argv)
     setpgrp();        /* break away from process group */
     
     logger(LOG,"nweb starting",argv[1],getpid());
+    
+    
+    
+    
+    
+    
     
     
     /* setup the network socket */
