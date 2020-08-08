@@ -102,6 +102,7 @@ void web(int fd, int hit)
     }    /* remove CF and LF characters */
         
     
+    
     logger(LOG,"request",buffer,hit);
     
     
@@ -117,6 +118,8 @@ void web(int fd, int hit)
         }
     }
     
+    logger(LOG,"request i2","",i);
+    logger(LOG,"request b2",buffer,hit);
     
     for(j=0;j<i-1;j++) {
         if(buffer[j] == '.' && buffer[j+1] == '.') {
@@ -130,7 +133,10 @@ void web(int fd, int hit)
         strcpy(buffer,"GET /index.html");
     } /* convert no filename to index file */
         
+    
+    logger(LOG,"request b3",buffer,hit);
 
+    
     /* work out the file type and check we support it */
     buflen = strlen(buffer);
     
@@ -158,8 +164,7 @@ void web(int fd, int hit)
     
     
     len = (long)lseek(file_fd, (off_t)0, SEEK_END); /* lseek to the file end to find the length */
-    
-          lseek(file_fd, (off_t)0, SEEK_SET); /* lseek back to the file start ready for reading */
+                lseek(file_fd, (off_t)0, SEEK_SET); /* lseek back to the file start ready for reading */
     
           sprintf(buffer,"HTTP/1.1 200 OK\nServer: nweb/%d.0\nContent-Length: %ld\nConnection: close\nContent-Type: %s\n\n", VERSION, len, fstr); /* Header + a blank line */
     
